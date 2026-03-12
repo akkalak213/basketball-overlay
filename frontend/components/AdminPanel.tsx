@@ -3,9 +3,23 @@
 import { useSocket } from '../lib/socket';
 import { Minus, Plus, RotateCcw, Play, Pause, Square, Eye, EyeOff } from 'lucide-react';
 import { formatTime, parseTime } from '../lib/formatTime';
+import { useState, useEffect } from 'react';
 
 export default function AdminPanel() {
   const { gameState, isConnected, updateState, resetState } = useSocket();
+
+  // Local state for smooth typing
+  const [homeNameInput, setHomeNameInput] = useState(gameState.homeName || '');
+  const [awayNameInput, setAwayNameInput] = useState(gameState.awayName || '');
+
+  // Sync local state when external game state changes (but not while typing)
+  useEffect(() => {
+    setHomeNameInput(gameState.homeName || '');
+  }, [gameState.homeName]);
+
+  useEffect(() => {
+    setAwayNameInput(gameState.awayName || '');
+  }, [gameState.awayName]);
 
   const handleScoreChange = (team: 'home' | 'away', amount: number) => {
     const key = `${team}Score` as keyof typeof gameState;
@@ -132,8 +146,12 @@ export default function AdminPanel() {
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-neutral-100">
                    <input
                       type="text"
-                      value={gameState.homeName}
-                      onChange={(e) => updateState({ homeName: e.target.value.toUpperCase() })}
+                      value={homeNameInput}
+                      onChange={(e) => {
+                         const val = e.target.value.toUpperCase();
+                         setHomeNameInput(val);
+                         updateState({ homeName: val });
+                      }}
                       className="text-3xl font-black uppercase bg-transparent focus:outline-none w-2/3 text-neutral-800 placeholder-neutral-300"
                       placeholder="HOME TEAM"
                    />
@@ -201,8 +219,12 @@ export default function AdminPanel() {
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-neutral-100 flex-row-reverse">
                    <input
                       type="text"
-                      value={gameState.awayName}
-                      onChange={(e) => updateState({ awayName: e.target.value.toUpperCase() })}
+                      value={awayNameInput}
+                      onChange={(e) => {
+                         const val = e.target.value.toUpperCase();
+                         setAwayNameInput(val);
+                         updateState({ awayName: val });
+                      }}
                       className="text-3xl font-black uppercase bg-transparent focus:outline-none w-2/3 text-neutral-800 placeholder-neutral-300 text-right"
                       placeholder="AWAY TEAM"
                       dir="rtl"
