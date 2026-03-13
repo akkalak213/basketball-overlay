@@ -1,13 +1,11 @@
 'use client';
 
 import { useSocket } from '../lib/socket';
-import { formatTime } from '../lib/formatTime';
 import React from 'react';
 
-// Super Compatibility Version for Yolobox Pro
+// Super Compatibility Version for Yolobox Pro - V3
 // This version uses a classic HTML table for layout and inline CSS styles for everything.
-// This approach maximizes compatibility with very old or limited web browsers that may not
-// fully support Flexbox, CSS variables, or modern Tailwind classes.
+// Changes: Reduced overall size, removed shot clock, redesigned Fouls/Timeouts, and expanded to 5 sets.
 
 export default function OverlayCompat() {
   const { gameState } = useSocket();
@@ -16,22 +14,22 @@ export default function OverlayCompat() {
     return null;
   }
 
+  // Calculate set wins
   let homeSetWins = 0;
   let awaySetWins = 0;
   if (gameState.homeQuarterScores && gameState.awayQuarterScores) {
-    for (let i = 0; i < Math.min(gameState.homeQuarterScores.length, gameState.awayQuarterScores.length); i++) {
-      if (gameState.homeQuarterScores[i] !== undefined && gameState.awayQuarterScores[i] !== undefined) {
-        if (gameState.homeQuarterScores[i] > gameState.awayQuarterScores[i]) {
-          homeSetWins++;
-        } else if (gameState.awayQuarterScores[i] > gameState.awayQuarterScores[i]) {
-          awaySetWins++;
-        }
+    for (let i = 0; i < Math.max(gameState.homeQuarterScores.length, gameState.awayQuarterScores.length); i++) {
+      const homeScore = gameState.homeQuarterScores[i] || 0;
+      const awayScore = gameState.awayQuarterScores[i] || 0;
+      if (homeScore > awayScore) {
+        homeSetWins++;
+      } else if (awayScore > homeScore) {
+        awaySetWins++;
       }
     }
   }
 
-  // --- Style Definitions (as JavaScript objects for inline styling) ---
-
+  // --- Style Definitions ---
   const styles: { [key: string]: React.CSSProperties } = {
     container: {
       position: 'fixed',
@@ -39,98 +37,135 @@ export default function OverlayCompat() {
       left: '0',
       width: '100%',
       display: 'flex',
-      justifyContent: 'center',
+      flexDirection: 'column',
+      alignItems: 'center',
       fontFamily: 'sans-serif',
       color: '#FFFFFF',
       textTransform: 'uppercase',
     },
     mainTable: {
       borderCollapse: 'collapse',
-      backgroundColor: '#111827', // zinc-900
+      backgroundColor: '#111827',
       border: '2px solid #000000',
-      borderRadius: '6px',
+      borderRadius: '6px 6px 0 0', // Rounded top corners
       boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
       overflow: 'hidden'
     },
     teamCell: {
-      padding: '8px 20px',
-      minWidth: '320px',
+      padding: '4px 16px',
+      minWidth: '280px',
       position: 'relative'
     },
     homeTeamCell: {
-      backgroundColor: '#1D4ED8', // blue-800
+      backgroundColor: '#1D4ED8',
       borderRight: '1px solid rgba(0,0,0,0.5)',
     },
     awayTeamCell: {
-      backgroundColor: '#BE123C', // red-800
+      backgroundColor: '#BE123C',
       borderLeft: '1px solid rgba(0,0,0,0.5)',
       textAlign: 'right'
     },
     teamName: {
-      fontSize: '42px',
+      fontSize: '36px',
       fontWeight: '900',
       letterSpacing: '0.05em',
       lineHeight: '1',
     },
     teamInfoContainer: {
         display: 'flex',
-        alignItems: 'flex-end',
+        alignItems: 'center',
         justifyContent: 'space-between'
     },
     foulsTimeouts: {
         textAlign: 'right' as const,
-        paddingBottom: '4px',
         marginLeft: '12px',
     },
     awayFoulsTimeouts: {
         textAlign: 'left' as const,
-        paddingBottom: '4px',
         marginRight: '12px',
     },
     infoText: {
-      fontSize: '12px',
+      fontSize: '11px',
       fontWeight: 'bold',
       color: 'rgba(255,255,255,0.9)',
+      lineHeight: '1.2'
     },
     scoreCell: {
       backgroundColor: '#000000',
-      width: '110px',
+      width: '90px',
       textAlign: 'center' as const,
-      fontSize: '64px',
+      fontSize: '52px',
       fontWeight: '900',
       borderLeft: '2px solid rgba(255,255,255,0.1)',
     },
     awayScoreCell: {
         backgroundColor: '#000000',
-        width: '110px',
+        width: '90px',
         textAlign: 'center' as const,
-        fontSize: '64px',
+        fontSize: '52px',
         fontWeight: '900',
         borderRight: '2px solid rgba(255,255,255,0.1)',
     },
-    centerClockCell: {
+    centerCell: {
       backgroundColor: '#0a0a0a',
-      width: '180px',
+      width: '160px',
       textAlign: 'center' as const,
       verticalAlign: 'middle',
       borderLeft: '1px solid #4B5563',
       borderRight: '1px solid #4B5563',
+      padding: '4px 0',
     },
-    gameClock: {
-      fontSize: '44px',
+    vsText: {
+      fontSize: '32px',
       fontWeight: 'bold',
-      color: '#FBBF24', // yellow-400
+      color: '#FBBF24',
+      lineHeight: '1',
     },
-    periodShotClockContainer: {
-        marginTop: '4px'
+    setWinsContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    possessionIndicator: {
-      position: 'absolute',
-      bottom: '0',
-      left: '0',
-      width: '100%',
-      height: '4px',
-      backgroundColor: '#FBBF24', // yellow-400
+    setScoreText: {
+        fontSize: '11px',
+        fontWeight: 'bold',
+        color: 'rgba(255,255,255,0.9)',
+    },
+    setScoreNumber: {
+        fontSize: '20px',
+        fontWeight: 'bold',
+        color: '#FBBF24',
+        margin: '0 8px'
+    },
+    setScoresContainer: {
+        display: 'flex',
+        backgroundColor: '#000000',
+        border: '1px solid rgba(255,255,255,0.2)',
+        borderTop: '0',
+        borderRadius: '0 0 12px 12px',
+        padding: '6px 20px',
+        boxShadow: '0 10px 20px rgba(0,0,0,0.4)',
+        justifyContent: 'center',
+        gap: '24px',
+    },
+    setScorePill: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
+    },
+    setScoreLabel: {
+        color: '#A0A0A0',
+        fontWeight: 'bold',
+        fontSize: '11px',
+        letterSpacing: '0.05em'
+    },
+    setScoreValues: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '5px',
+        fontWeight: '900',
+        fontSize: '14px',
+        color: '#FFFFFF'
     }
   };
 
@@ -141,18 +176,13 @@ export default function OverlayCompat() {
           <tr>
             {/* ======================= HOME TEAM ======================= */}
             <td style={{...styles.teamCell, ...styles.homeTeamCell}}>
-
                <div style={styles.teamInfoContainer}>
                     <div>
                         <div style={styles.teamName}>{gameState.homeName}</div>
                     </div>
                     <div style={styles.foulsTimeouts}>
-                        <div style={styles.infoText}>
-                            FOULS: <span style={{color: '#F87171'}}>{gameState.homeFouls}</span>
-                        </div>
-                         <div style={styles.infoText}>
-                            T.O: {gameState.homeTimeouts}
-                        </div>
+                        <div style={styles.infoText}>FOULS: <span style={{color: '#F87171'}}>{gameState.homeFouls}</span></div>
+                        <div style={styles.infoText}>T.O: {gameState.homeTimeouts}</div>
                     </div>
                </div>
             </td>
@@ -160,20 +190,15 @@ export default function OverlayCompat() {
               {gameState.homeScore}
             </td>
 
-            {/* ======================= CENTER CLOCK ======================= */}
-            <td style={styles.centerClockCell}>
-              <div style={styles.gameClock}>VS</div>
-              <div style={{...styles.periodShotClockContainer, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '4px'}}>
-                 <span style={{fontSize: '24px', fontWeight: 'bold', color: '#FBBF24', marginRight: '8px'}}>{homeSetWins}</span>
-                 <span style={{...styles.infoText, fontSize: '18px'}}>SETS</span>
-                 <span style={{fontSize: '24px', fontWeight: 'bold', color: '#FBBF24', marginLeft: '8px'}}>{awaySetWins}</span>
+            {/* ======================= CENTER SECTION ======================= */}
+            <td style={styles.centerCell}>
+              <div style={styles.vsText}>VS</div>
+              <div style={styles.setWinsContainer}>
+                 <span style={styles.setScoreNumber}>{homeSetWins}</span>
+                 <span style={styles.setScoreText}>SETS</span>
+                 <span style={styles.setScoreNumber}>{awaySetWins}</span>
               </div>
-              <div style={styles.periodShotClockContainer}>
-                 <span style={styles.infoText}>SET {gameState.period}</span>
-                 <span style={{...styles.infoText, marginLeft: '10px', fontSize: '24px', color: gameState.shotClock <= 5 ? '#EF4444' : '#F87171' }}>
-                    {gameState.shotClock.toString().padStart(2, '0')}
-                 </span>
-              </div>
+              <div style={styles.setScoreText}>SET {gameState.period}</div>
             </td>
 
             {/* ======================= AWAY TEAM ======================= */}
@@ -181,15 +206,10 @@ export default function OverlayCompat() {
                {gameState.awayScore}
             </td>
             <td style={{...styles.teamCell, ...styles.awayTeamCell}}>
-
                 <div style={styles.teamInfoContainer}>
                     <div style={styles.awayFoulsTimeouts}>
-                        <div style={styles.infoText}>
-                            FOULS: <span style={{color: '#F87171'}}>{gameState.awayFouls}</span>
-                        </div>
-                         <div style={styles.infoText}>
-                            T.O: {gameState.awayTimeouts}
-                        </div>
+                        <div style={styles.infoText}>FOULS: <span style={{color: '#F87171'}}>{gameState.awayFouls}</span></div>
+                        <div style={styles.infoText}>T.O: {gameState.awayTimeouts}</div>
                     </div>
                     <div>
                         <div style={styles.teamName}>{gameState.awayName}</div>
@@ -199,6 +219,31 @@ export default function OverlayCompat() {
           </tr>
         </tbody>
       </table>
+      
+      {/* ======================= SET SCORES ======================= */}
+      <div style={styles.setScoresContainer}>
+         {[0, 1, 2, 3, 4].map(q => {
+           const homeScore = gameState.homeQuarterScores?.[q];
+           const awayScore = gameState.awayQuarterScores?.[q];
+
+           // Don't render the set if scores are not yet available
+           if (homeScore === undefined || awayScore === undefined) return null;
+
+           const isHomeWin = homeScore > awayScore;
+           const isAwayWin = awayScore > homeScore;
+           
+           return (
+             <div key={q} style={styles.setScorePill}>
+               <span style={styles.setScoreLabel}>SET{q+1}</span>
+               <div style={styles.setScoreValues}>
+                  <span style={{color: isHomeWin ? '#FBBF24' : '#FFFFFF'}}>{homeScore}</span>
+                  <span style={{color: '#4B5563', fontSize: '11px'}}>-</span>
+                  <span style={{color: isAwayWin ? '#FBBF24' : '#FFFFFF'}}>{awayScore}</span>
+               </div>
+             </div>
+           );
+         })}
+      </div>
     </div>
   );
 }
