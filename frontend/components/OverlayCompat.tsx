@@ -16,6 +16,20 @@ export default function OverlayCompat() {
     return null;
   }
 
+  let homeSetWins = 0;
+  let awaySetWins = 0;
+  if (gameState.homeQuarterScores && gameState.awayQuarterScores) {
+    for (let i = 0; i < Math.min(gameState.homeQuarterScores.length, gameState.awayQuarterScores.length); i++) {
+      if (gameState.homeQuarterScores[i] !== undefined && gameState.awayQuarterScores[i] !== undefined) {
+        if (gameState.homeQuarterScores[i] > gameState.awayQuarterScores[i]) {
+          homeSetWins++;
+        } else if (gameState.awayQuarterScores[i] > gameState.awayQuarterScores[i]) {
+          awaySetWins++;
+        }
+      }
+    }
+  }
+
   // --- Style Definitions (as JavaScript objects for inline styling) ---
 
   const styles: { [key: string]: React.CSSProperties } = {
@@ -127,7 +141,7 @@ export default function OverlayCompat() {
           <tr>
             {/* ======================= HOME TEAM ======================= */}
             <td style={{...styles.teamCell, ...styles.homeTeamCell}}>
-               {gameState.possession === 'HOME' && <div style={styles.possessionIndicator}></div>}
+
                <div style={styles.teamInfoContainer}>
                     <div>
                         <div style={styles.teamName}>{gameState.homeName}</div>
@@ -148,9 +162,14 @@ export default function OverlayCompat() {
 
             {/* ======================= CENTER CLOCK ======================= */}
             <td style={styles.centerClockCell}>
-              <div style={styles.gameClock}>{formatTime(gameState.gameClockSecs || 0)}</div>
+              <div style={styles.gameClock}>VS</div>
+              <div style={{...styles.periodShotClockContainer, display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '4px'}}>
+                 <span style={{fontSize: '24px', fontWeight: 'bold', color: '#FBBF24', marginRight: '8px'}}>{homeSetWins}</span>
+                 <span style={{...styles.infoText, fontSize: '18px'}}>SETS</span>
+                 <span style={{fontSize: '24px', fontWeight: 'bold', color: '#FBBF24', marginLeft: '8px'}}>{awaySetWins}</span>
+              </div>
               <div style={styles.periodShotClockContainer}>
-                 <span style={styles.infoText}>Q{gameState.period}</span>
+                 <span style={styles.infoText}>SET {gameState.period}</span>
                  <span style={{...styles.infoText, marginLeft: '10px', fontSize: '24px', color: gameState.shotClock <= 5 ? '#EF4444' : '#F87171' }}>
                     {gameState.shotClock.toString().padStart(2, '0')}
                  </span>
@@ -162,7 +181,7 @@ export default function OverlayCompat() {
                {gameState.awayScore}
             </td>
             <td style={{...styles.teamCell, ...styles.awayTeamCell}}>
-                {gameState.possession === 'AWAY' && <div style={styles.possessionIndicator}></div>}
+
                 <div style={styles.teamInfoContainer}>
                     <div style={styles.awayFoulsTimeouts}>
                         <div style={styles.infoText}>
