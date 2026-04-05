@@ -1,9 +1,9 @@
-import Overlay from '@/components/Overlay';
+import OverlayCompat from '../../components/OverlayCompat';
 
 export default function OverlayPage() {
   return (
     <main className="min-h-screen bg-transparent">
-      <Overlay />
+      <OverlayCompat />
     </main>
   );
 }

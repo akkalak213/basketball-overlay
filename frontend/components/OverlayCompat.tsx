@@ -3,10 +3,7 @@
 import { useSocket } from '../lib/socket';
 import React from 'react';
 
-// Super Compatibility Version for Yolobox Pro - V3
-// This version uses a classic HTML table for layout and inline CSS styles for everything.
-// Changes: Reduced overall size, removed shot clock, redesigned Fouls/Timeouts, and expanded to 5 sets.
-
+// Multi-Sport Compatible Overlay with Logo Support
 export default function OverlayCompat() {
   const { gameState } = useSocket();
 
@@ -14,20 +11,13 @@ export default function OverlayCompat() {
     return null;
   }
 
-  // Calculate set wins
-  let homeSetWins = 0;
-  let awaySetWins = 0;
-  if (gameState.homeQuarterScores && gameState.awayQuarterScores) {
-    for (let i = 0; i < Math.max(gameState.homeQuarterScores.length, gameState.awayQuarterScores.length); i++) {
-      const homeScore = gameState.homeQuarterScores[i] || 0;
-      const awayScore = gameState.awayQuarterScores[i] || 0;
-      if (homeScore > awayScore) {
-        homeSetWins++;
-      } else if (awayScore > homeScore) {
-        awaySetWins++;
-      }
-    }
-  }
+  // Fallback colors if not set
+  const homeColor = gameState.homeColor || '#1D4ED8';
+  const awayColor = gameState.awayColor || '#BE123C';
+
+  const isBasketball = gameState.sportType === 'basketball3x3';
+  const numSets = gameState.sportType === 'takraw' ? 3 : 5;
+  const showSets = gameState.sportType === 'volleyball' || gameState.sportType === 'takraw';
 
   // --- Style Definitions ---
   const styles: { [key: string]: React.CSSProperties } = {
@@ -43,76 +33,67 @@ export default function OverlayCompat() {
       color: '#FFFFFF',
       textTransform: 'uppercase',
     },
+    logoContainer: {
+      position: 'relative',
+      zIndex: 0,
+      marginBottom: `${gameState.logoOffset ?? -30}px`, // ใช้ offset จาก Admin
+      left: `${gameState.logoOffsetX ?? 0}px`, // ขยับซ้ายขวา
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.5))',
+    },
+    logoImage: {
+      maxHeight: `${gameState.logoSize || 160}px`, // ขยายหรือลดขนาดตามใจชอบ
+      maxWidth: '600px',
+      objectFit: 'contain',
+    },
     mainTable: {
+      position: 'relative',
+      zIndex: 10, // ให้อยู่เหนือโลโก้
       borderCollapse: 'collapse',
       backgroundColor: '#111827',
       border: '2px solid #000000',
-      borderRadius: '6px 6px 0 0', // Rounded top corners
+      borderRadius: showSets ? '6px 6px 0 0' : '6px', // Rounded top corners or all corners
       boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
       overflow: 'hidden'
     },
     teamCell: {
-      padding: '4px 16px',
+      padding: '4px 24px',
       minWidth: '280px',
-      position: 'relative'
+      position: 'relative',
     },
     homeTeamCell: {
-      backgroundColor: '#1D4ED8',
+      backgroundColor: homeColor,
       borderRight: '1px solid rgba(0,0,0,0.5)',
+      textAlign: 'center'
     },
     awayTeamCell: {
-      backgroundColor: '#BE123C',
+      backgroundColor: awayColor,
       borderLeft: '1px solid rgba(0,0,0,0.5)',
-      textAlign: 'right'
+      textAlign: 'center'
     },
     teamName: {
-      fontSize: '36px',
+      fontSize: '40px',
       fontWeight: '900',
       letterSpacing: '0.05em',
       lineHeight: '1',
-    },
-    teamInfoContainer: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-    },
-    foulsTimeouts: {
-        textAlign: 'right' as const,
-        marginLeft: '12px',
-    },
-    awayFoulsTimeouts: {
-        textAlign: 'left' as const,
-        marginRight: '12px',
-    },
-    infoText: {
-      fontSize: '11px',
-      fontWeight: 'bold',
-      color: 'rgba(255,255,255,0.9)',
-      lineHeight: '1.2'
+      textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
     },
     scoreCell: {
       backgroundColor: '#000000',
-      width: '90px',
+      width: '100px',
       textAlign: 'center' as const,
-      fontSize: '52px',
+      fontSize: '56px',
       fontWeight: '900',
       borderLeft: '2px solid rgba(255,255,255,0.1)',
-    },
-    awayScoreCell: {
-        backgroundColor: '#000000',
-        width: '90px',
-        textAlign: 'center' as const,
-        fontSize: '52px',
-        fontWeight: '900',
-        borderRight: '2px solid rgba(255,255,255,0.1)',
+      borderRight: '2px solid rgba(255,255,255,0.1)',
     },
     centerCell: {
       backgroundColor: '#0a0a0a',
       width: '160px',
       textAlign: 'center' as const,
       verticalAlign: 'middle',
-      borderLeft: '1px solid #4B5563',
-      borderRight: '1px solid #4B5563',
       padding: '4px 0',
     },
     vsText: {
@@ -171,20 +152,54 @@ export default function OverlayCompat() {
 
   return (
     <div style={styles.container}>
-      <table style={styles.mainTable}>
+      
+      {/* ======================= LOGO SECTION ======================= */}
+      {gameState.tournamentLogo && (
+        <div className="animated-logo-entrance">
+          <div style={styles.logoContainer} className="animated-logo-float">
+            <img src={gameState.tournamentLogo} alt="Tournament Logo" style={styles.logoImage} />
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes subtleFloat {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-12px); }
+          100% { transform: translateY(0px); }
+        }
+        @keyframes slideUpFade {
+          0% { opacity: 0; transform: translateY(40px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes subtleGlow {
+          0% { box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+          50% { box-shadow: 0 10px 35px rgba(255,255,255,0.1); }
+          100% { box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        }
+        .animated-logo-entrance {
+          animation: slideUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          opacity: 0;
+        }
+        .animated-logo-float {
+          animation: subtleFloat 4s ease-in-out infinite;
+        }
+        .animated-scoreboard {
+          animation: slideUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards, subtleGlow 6s ease-in-out infinite;
+          opacity: 0; /* Starts hidden until animation plays */
+        }
+        .animated-sets {
+          animation: slideUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+          opacity: 0;
+        }
+      `}</style>
+
+      <table style={styles.mainTable} className="animated-scoreboard">
         <tbody>
           <tr>
             {/* ======================= HOME TEAM ======================= */}
             <td style={{...styles.teamCell, ...styles.homeTeamCell}}>
-               <div style={styles.teamInfoContainer}>
-                    <div>
-                        <div style={styles.teamName}>{gameState.homeName}</div>
-                    </div>
-                    <div style={styles.foulsTimeouts}>
-                        <div style={styles.infoText}>FOULS: <span style={{color: '#F87171'}}>{gameState.homeFouls}</span></div>
-                        <div style={styles.infoText}>T.O: {gameState.homeTimeouts}</div>
-                    </div>
-               </div>
+               <div style={styles.teamName}>{gameState.homeName}</div>
             </td>
             <td style={styles.scoreCell}>
               {gameState.homeScore}
@@ -192,58 +207,61 @@ export default function OverlayCompat() {
 
             {/* ======================= CENTER SECTION ======================= */}
             <td style={styles.centerCell}>
-              <div style={styles.vsText}>VS</div>
-              <div style={styles.setWinsContainer}>
-                 <span style={styles.setScoreNumber}>{homeSetWins}</span>
-                 <span style={styles.setScoreText}>SETS</span>
-                 <span style={styles.setScoreNumber}>{awaySetWins}</span>
-              </div>
-              <div style={styles.setScoreText}>SET {gameState.period}</div>
+              {isBasketball ? (
+                <>
+                  <div style={styles.vsText}>VS</div>
+                  <div style={{...styles.setScoreText, marginTop: '8px'}}>PERIOD {gameState.period}</div>
+                </>
+              ) : (
+                <>
+                  <div style={styles.vsText}>VS</div>
+                  <div style={styles.setWinsContainer}>
+                     <span style={styles.setScoreNumber}>{gameState.homeSetsWon}</span>
+                     <span style={styles.setScoreText}>SETS</span>
+                     <span style={styles.setScoreNumber}>{gameState.awaySetsWon}</span>
+                  </div>
+                  <div style={styles.setScoreText}>SET {gameState.period}</div>
+                </>
+              )}
             </td>
 
             {/* ======================= AWAY TEAM ======================= */}
-            <td style={styles.awayScoreCell}>
+            <td style={styles.scoreCell}>
                {gameState.awayScore}
             </td>
             <td style={{...styles.teamCell, ...styles.awayTeamCell}}>
-                <div style={styles.teamInfoContainer}>
-                    <div style={styles.awayFoulsTimeouts}>
-                        <div style={styles.infoText}>FOULS: <span style={{color: '#F87171'}}>{gameState.awayFouls}</span></div>
-                        <div style={styles.infoText}>T.O: {gameState.awayTimeouts}</div>
-                    </div>
-                    <div>
-                        <div style={styles.teamName}>{gameState.awayName}</div>
-                    </div>
-               </div>
+                <div style={styles.teamName}>{gameState.awayName}</div>
             </td>
           </tr>
         </tbody>
       </table>
       
       {/* ======================= SET SCORES ======================= */}
-      <div style={styles.setScoresContainer}>
-         {[0, 1, 2, 3, 4].map(q => {
-           const homeScore = gameState.homeQuarterScores?.[q];
-           const awayScore = gameState.awayQuarterScores?.[q];
+      {showSets && (
+        <div style={styles.setScoresContainer} className="animated-sets">
+           {Array.from({ length: numSets }).map((_, q) => {
+             const homeScore = gameState.homeQuarterScores?.[q];
+             const awayScore = gameState.awayQuarterScores?.[q];
 
-           // Don't render the set if scores are not yet available
-           if (homeScore === undefined || awayScore === undefined) return null;
+             // Don't render the set if scores are not yet available
+             if (homeScore === undefined || awayScore === undefined) return null;
 
-           const isHomeWin = homeScore > awayScore;
-           const isAwayWin = awayScore > homeScore;
-           
-           return (
-             <div key={q} style={styles.setScorePill}>
-               <span style={styles.setScoreLabel}>SET{q+1}</span>
-               <div style={styles.setScoreValues}>
-                  <span style={{color: isHomeWin ? '#FBBF24' : '#FFFFFF'}}>{homeScore}</span>
-                  <span style={{color: '#4B5563', fontSize: '11px'}}>-</span>
-                  <span style={{color: isAwayWin ? '#FBBF24' : '#FFFFFF'}}>{awayScore}</span>
+             const isHomeWin = homeScore > awayScore;
+             const isAwayWin = awayScore > homeScore;
+             
+             return (
+               <div key={q} style={styles.setScorePill}>
+                 <span style={styles.setScoreLabel}>SET{q+1}</span>
+                 <div style={styles.setScoreValues}>
+                    <span style={{color: isHomeWin ? '#FBBF24' : '#FFFFFF'}}>{homeScore}</span>
+                    <span style={{color: '#4B5563', fontSize: '11px'}}>-</span>
+                    <span style={{color: isAwayWin ? '#FBBF24' : '#FFFFFF'}}>{awayScore}</span>
+                 </div>
                </div>
-             </div>
-           );
-         })}
-      </div>
+             );
+           })}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,37 +1,39 @@
 export interface GameState {
+  sportType: 'basketball3x3' | 'volleyball' | 'takraw';
   homeName: string;
   awayName: string;
+  homeColor: string;
+  awayColor: string;
   homeScore: number;
   awayScore: number;
+  homeSetsWon: number;
+  awaySetsWon: number;
   period: number;
-  gameClockSecs: number;
-  shotClock: number;
-  isClockRunning: boolean;
-  homeFouls: number;
-  awayFouls: number;
-  homeTimeouts: number;
-  awayTimeouts: number;
-  possession: 'HOME' | 'AWAY' | null;
   homeQuarterScores: number[];
   awayQuarterScores: number[];
   isOverlayVisible: boolean;
+  tournamentLogo: string | null;
+  logoSize: number;
+  logoOffset: number;
+  logoOffsetX: number;
 }
 
 export const initialState: GameState = {
+  sportType: 'volleyball',
   homeName: 'HOME',
   awayName: 'AWAY',
+  homeColor: '#1D4ED8',
+  awayColor: '#BE123C',
   homeScore: 0,
   awayScore: 0,
+  homeSetsWon: 0,
+  awaySetsWon: 0,
   period: 1,
-  gameClockSecs: 720, // 12 minutes
-  shotClock: 24,
-  isClockRunning: false,
-  homeFouls: 0,
-  awayFouls: 0,
-  homeTimeouts: 3,
-  awayTimeouts: 3,
-  possession: null,
-  homeQuarterScores: [0, 0, 0, 0],
-  awayQuarterScores: [0, 0, 0, 0],
+  homeQuarterScores: [0, 0, 0, 0, 0],
+  awayQuarterScores: [0, 0, 0, 0, 0],
   isOverlayVisible: true,
+  tournamentLogo: null,
+  logoSize: 160,
+  logoOffset: -30,
+  logoOffsetX: 0,
 };
