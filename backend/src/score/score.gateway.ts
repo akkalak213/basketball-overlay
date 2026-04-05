@@ -23,6 +23,9 @@ export interface GameState {
   homeQuarterScores: number[];
   awayQuarterScores: number[];
   isOverlayVisible: boolean;
+}
+
+export interface LogoState {
   tournamentLogo: string | null;
   logoSize: number;
   logoOffset: number;
@@ -43,6 +46,9 @@ const initialState: GameState = {
   homeQuarterScores: [0, 0, 0, 0, 0],
   awayQuarterScores: [0, 0, 0, 0, 0],
   isOverlayVisible: true,
+};
+
+const initialLogoState: LogoState = {
   tournamentLogo: null,
   logoSize: 160,
   logoOffset: -30,
@@ -62,6 +68,7 @@ export class ScoreGateway
     homeQuarterScores: [...initialState.homeQuarterScores],
     awayQuarterScores: [...initialState.awayQuarterScores]
   };
+  private logoState: LogoState = { ...initialLogoState };
 
   afterInit(server: Server) {
     console.log('WebSocket Initialized');
@@ -69,6 +76,7 @@ export class ScoreGateway
 
   handleConnection(client: Socket) {
     client.emit('syncState', this.state);
+    client.emit('syncLogo', this.logoState);
   }
 
   handleDisconnect(client: Socket) {}
@@ -78,6 +86,13 @@ export class ScoreGateway
     this.state = { ...this.state, ...updateData };
     this.server.emit('syncState', this.state);
     return this.state;
+  }
+
+  @SubscribeMessage('updateLogo')
+  handleUpdateLogo(@MessageBody() updateData: Partial<LogoState>): LogoState {
+    this.logoState = { ...this.logoState, ...updateData };
+    this.server.emit('syncLogo', this.logoState);
+    return this.logoState;
   }
 
   @SubscribeMessage('resetState')

@@ -5,7 +5,7 @@ import React from 'react';
 
 // Multi-Sport Compatible Overlay with Logo Support
 export default function OverlayCompat() {
-  const { gameState } = useSocket();
+  const { gameState, logoState } = useSocket();
 
   if (!gameState.isOverlayVisible) {
     return null;
@@ -36,15 +36,15 @@ export default function OverlayCompat() {
     logoContainer: {
       position: 'relative',
       zIndex: 0,
-      marginBottom: `${gameState.logoOffset ?? -30}px`, // ใช้ offset จาก Admin
-      left: `${gameState.logoOffsetX ?? 0}px`, // ขยับซ้ายขวา
+      marginBottom: `${logoState.logoOffset ?? -30}px`, // ใช้ offset จาก Admin
+      left: `${logoState.logoOffsetX ?? 0}px`, // ขยับซ้ายขวา
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.5))',
     },
     logoImage: {
-      maxHeight: `${gameState.logoSize || 160}px`, // ขยายหรือลดขนาดตามใจชอบ
+      maxHeight: `${logoState.logoSize || 160}px`, // ขยายหรือลดขนาดตามใจชอบ
       maxWidth: '600px',
       objectFit: 'contain',
     },
@@ -154,10 +154,10 @@ export default function OverlayCompat() {
     <div style={styles.container}>
       
       {/* ======================= LOGO SECTION ======================= */}
-      {gameState.tournamentLogo && (
+      {logoState.tournamentLogo && (
         <div className="animated-logo-entrance">
           <div style={styles.logoContainer} className="animated-logo-float">
-            <img src={gameState.tournamentLogo} alt="Tournament Logo" style={styles.logoImage} />
+            <img src={logoState.tournamentLogo} alt="Tournament Logo" style={styles.logoImage} />
           </div>
         </div>
       )}

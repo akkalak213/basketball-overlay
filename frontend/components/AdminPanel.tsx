@@ -5,17 +5,19 @@ import { Minus, Plus, RotateCcw, Eye, EyeOff, Trophy, Activity, Image as ImageIc
 import { useState, useEffect, useRef } from 'react';
 
 export default function AdminPanel() {
-  const { gameState, isConnected, updateState, resetState } = useSocket();
+  const { gameState, logoState, isConnected, updateState, updateLogo, resetState } = useSocket();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [homeNameInput, setHomeNameInput] = useState(gameState.homeName || '');
   const [awayNameInput, setAwayNameInput] = useState(gameState.awayName || '');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHomeNameInput(gameState.homeName || '');
   }, [gameState.homeName]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAwayNameInput(gameState.awayName || '');
   }, [gameState.awayName]);
 
@@ -33,10 +35,11 @@ export default function AdminPanel() {
         else if (a > h) aw++;
       }
       if (hw !== gameState.homeSetsWon || aw !== gameState.awaySetsWon) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         updateState({ homeSetsWon: hw, awaySetsWon: aw });
       }
     }
-  }, [gameState.homeQuarterScores, gameState.awayQuarterScores, gameState.sportType]);
+  }, [gameState.homeQuarterScores, gameState.awayQuarterScores, gameState.sportType, gameState.homeSetsWon, gameState.awaySetsWon, updateState]);
 
   const handleScoreChange = (team: 'home' | 'away', amount: number) => {
     const key = `${team}Score` as keyof typeof gameState;
@@ -61,14 +64,38 @@ export default function AdminPanel() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        updateState({ tournamentLogo: reader.result as string });
+        // Client-side compression to avoid slow websocket transfers
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_HEIGHT = 400; // Resize large images for overlay display safely
+          let width = img.width;
+          let height = img.height;
+
+          if (height > MAX_HEIGHT) {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL('image/png', 0.8);
+            updateLogo({ tournamentLogo: compressedBase64 });
+          } else {
+            updateLogo({ tournamentLogo: reader.result as string });
+          }
+        };
+        img.src = reader.result as string;
       };
       reader.readAsDataURL(file);
     }
   };
 
   const clearLogo = () => {
-    updateState({ tournamentLogo: null });
+    updateLogo({ tournamentLogo: null });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -143,10 +170,11 @@ export default function AdminPanel() {
                <ImageIcon size={14} className="mr-1.5" /> Tournament Logo
              </span>
              <div className="flex flex-col items-center space-y-4 w-full">
-                {gameState.tournamentLogo ? (
+                {logoState.tournamentLogo ? (
                   <div className="flex flex-col w-full items-center space-y-3">
                     <div className="relative group">
-                      <img src={gameState.tournamentLogo} alt="Tournament Logo" className="h-20 object-contain rounded-lg border border-neutral-200 p-1" />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={logoState.tournamentLogo} alt="Tournament Logo" className="h-20 object-contain rounded-lg border border-neutral-200 p-1" />
                       <button onClick={clearLogo} className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-md hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100">
                         <X size={14} />
                       </button>
@@ -156,36 +184,36 @@ export default function AdminPanel() {
                       <div className="flex flex-col">
                         <label className="text-[10px] font-bold text-neutral-500 flex justify-between">
                           <span>Size (Height)</span>
-                          <span>{gameState.logoSize || 160}px</span>
+                          <span>{logoState.logoSize || 160}px</span>
                         </label>
                         <input 
                           type="range" min="50" max="400" 
-                          value={gameState.logoSize || 160}
-                          onChange={(e) => updateState({ logoSize: parseInt(e.target.value) })}
+                          value={logoState.logoSize || 160}
+                          onChange={(e) => updateLogo({ logoSize: parseInt(e.target.value) })}
                           className="w-full accent-blue-600 h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer"
                         />
                       </div>
                       <div className="flex flex-col">
                         <label className="text-[10px] font-bold text-neutral-500 flex justify-between">
                           <span>Vertical Offset (Y)</span>
-                          <span>{gameState.logoOffset ?? -30}px</span>
+                          <span>{logoState.logoOffset ?? -30}px</span>
                         </label>
                         <input 
                           type="range" min="-150" max="50" 
-                          value={gameState.logoOffset ?? -30}
-                          onChange={(e) => updateState({ logoOffset: parseInt(e.target.value) })}
+                          value={logoState.logoOffset ?? -30}
+                          onChange={(e) => updateLogo({ logoOffset: parseInt(e.target.value) })}
                           className="w-full accent-blue-600 h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer"
                         />
                       </div>
                       <div className="flex flex-col">
                         <label className="text-[10px] font-bold text-neutral-500 flex justify-between">
                           <span>Horizontal Offset (X)</span>
-                          <span>{gameState.logoOffsetX ?? 0}px</span>
+                          <span>{logoState.logoOffsetX ?? 0}px</span>
                         </label>
                         <input 
                           type="range" min="-300" max="300" 
-                          value={gameState.logoOffsetX ?? 0}
-                          onChange={(e) => updateState({ logoOffsetX: parseInt(e.target.value) })}
+                          value={logoState.logoOffsetX ?? 0}
+                          onChange={(e) => updateLogo({ logoOffsetX: parseInt(e.target.value) })}
                           className="w-full accent-blue-600 h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer"
                         />
                       </div>

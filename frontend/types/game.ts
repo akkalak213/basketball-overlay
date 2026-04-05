@@ -12,10 +12,6 @@ export interface GameState {
   homeQuarterScores: number[];
   awayQuarterScores: number[];
   isOverlayVisible: boolean;
-  tournamentLogo: string | null;
-  logoSize: number;
-  logoOffset: number;
-  logoOffsetX: number;
 }
 
 export const initialState: GameState = {
@@ -32,6 +28,16 @@ export const initialState: GameState = {
   homeQuarterScores: [0, 0, 0, 0, 0],
   awayQuarterScores: [0, 0, 0, 0, 0],
   isOverlayVisible: true,
+};
+
+export interface LogoState {
+  tournamentLogo: string | null;
+  logoSize: number;
+  logoOffset: number;
+  logoOffsetX: number;
+}
+
+export const initialLogoState: LogoState = {
   tournamentLogo: null,
   logoSize: 160,
   logoOffset: -30,

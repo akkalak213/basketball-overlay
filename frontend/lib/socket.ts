@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { GameState, initialState } from '../types/game';
+import { GameState, initialState, LogoState, initialLogoState } from '../types/game';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
 
 export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [gameState, setGameState] = useState<GameState>(initialState);
+  const [logoState, setLogoState] = useState<LogoState>(initialLogoState);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
@@ -26,6 +27,11 @@ export const useSocket = () => {
       setGameState(state);
     });
 
+    socketInstance.on('syncLogo', (state: LogoState) => {
+      setLogoState(state);
+    });
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSocket(socketInstance);
 
     return () => {
@@ -39,11 +45,17 @@ export const useSocket = () => {
     }
   };
 
+  const updateLogo = (updates: Partial<LogoState>) => {
+    if (socket) {
+      socket.emit('updateLogo', updates);
+    }
+  };
+
   const resetState = () => {
     if (socket) {
       socket.emit('resetState');
     }
   };
 
-  return { socket, gameState, isConnected, updateState, resetState };
+  return { socket, gameState, logoState, isConnected, updateState, updateLogo, resetState };
 };
