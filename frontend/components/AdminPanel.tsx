@@ -1,7 +1,7 @@
 'use client';
 
 import { useSocket } from '../lib/socket';
-import { Minus, Plus, RotateCcw, Eye, EyeOff, Trophy, Activity, Image as ImageIcon, X } from 'lucide-react';
+import { Minus, Plus, RotateCcw, Eye, EyeOff, Trophy, Activity, Image as ImageIcon, X, ArrowRightLeft } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 export default function AdminPanel() {
@@ -100,6 +100,21 @@ export default function AdminPanel() {
     }
   };
 
+  const handleSwapSides = () => {
+    updateState({
+      homeName: gameState.awayName,
+      awayName: gameState.homeName,
+      homeColor: gameState.awayColor,
+      awayColor: gameState.homeColor,
+      homeScore: gameState.awayScore,
+      awayScore: gameState.homeScore,
+      homeSetsWon: gameState.awaySetsWon,
+      awaySetsWon: gameState.homeSetsWon,
+      homeQuarterScores: gameState.awayQuarterScores,
+      awayQuarterScores: gameState.homeQuarterScores,
+    });
+  };
+
   const numSets = gameState.sportType === 'takraw' ? 3 : 5;
   const showSets = gameState.sportType === 'volleyball' || gameState.sportType === 'takraw';
 
@@ -129,6 +144,13 @@ export default function AdminPanel() {
               >
                 {gameState.isOverlayVisible ? <Eye size={16} className="mr-2" /> : <EyeOff size={16} className="mr-2" />}
                 {gameState.isOverlayVisible ? 'Hide Overlay' : 'Show Overlay'}
+              </button>
+              <button
+                onClick={handleSwapSides}
+                className="flex items-center px-4 py-2 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg font-bold transition-colors border border-purple-100"
+              >
+                <ArrowRightLeft size={16} className="mr-2" />
+                Swap Sides
               </button>
               <button
                 onClick={() => updateState({ homeScore: 0, awayScore: 0 })}
