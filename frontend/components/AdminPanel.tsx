@@ -1,7 +1,7 @@
 'use client';
 
 import { useSocket } from '../lib/socket';
-import { Minus, Plus, RotateCcw, Eye, EyeOff, Trophy, Activity, Image as ImageIcon, X, ArrowRightLeft } from 'lucide-react';
+import { Minus, Plus, RotateCcw, Eye, EyeOff, Trophy, Activity, Image as ImageIcon, X, ArrowRightLeft, Type } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
 export default function AdminPanel() {
@@ -10,6 +10,7 @@ export default function AdminPanel() {
 
   const [homeNameInput, setHomeNameInput] = useState(gameState.homeName || '');
   const [awayNameInput, setAwayNameInput] = useState(gameState.awayName || '');
+  const [scrollingTextInput, setScrollingTextInput] = useState(gameState.scrollingText || '');
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -20,6 +21,11 @@ export default function AdminPanel() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAwayNameInput(gameState.awayName || '');
   }, [gameState.awayName]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setScrollingTextInput(gameState.scrollingText || '');
+  }, [gameState.scrollingText]);
 
   // Auto-calculate sets won
   useEffect(() => {
@@ -292,6 +298,36 @@ export default function AdminPanel() {
                 <button onClick={() => handlePeriodChange(1)} className="p-4 bg-neutral-100 hover:bg-neutral-200 rounded-full text-neutral-600 transition-colors"><Plus size={24} /></button>
              </div>
           </div>
+        </div>
+
+        {/* Scrolling Text Control */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-200 mb-6">
+          <div className="flex items-center justify-between mb-4">
+             <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest flex items-center">
+               <Type size={14} className="mr-1.5" /> Scrolling Text
+             </span>
+             <button
+                onClick={() => updateState({ isScrollingTextVisible: !gameState.isScrollingTextVisible })}
+                className={`flex items-center px-3 py-1.5 rounded-lg text-sm font-bold transition-colors border ${
+                  gameState.isScrollingTextVisible 
+                    ? 'bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-100' 
+                    : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200 border-neutral-200'
+                }`}
+              >
+                {gameState.isScrollingTextVisible ? <Eye size={14} className="mr-2" /> : <EyeOff size={14} className="mr-2" />}
+                {gameState.isScrollingTextVisible ? 'Hide Text' : 'Show Text'}
+              </button>
+          </div>
+          <input
+            type="text"
+            value={scrollingTextInput}
+            onChange={(e) => {
+               setScrollingTextInput(e.target.value);
+               updateState({ scrollingText: e.target.value });
+            }}
+            className="w-full text-lg font-medium p-3 rounded-xl border border-neutral-200 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 bg-neutral-50"
+            placeholder="Enter scrolling text here..."
+          />
         </div>
 
         {/* Teams Grid */}

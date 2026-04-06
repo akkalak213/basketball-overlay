@@ -18,6 +18,7 @@ export default function OverlayCompat() {
   const isBasketball = gameState.sportType === 'basketball3x3';
   const numSets = gameState.sportType === 'takraw' ? 3 : 5;
   const showSets = gameState.sportType === 'volleyball' || gameState.sportType === 'takraw';
+  const isTied = gameState.homeScore === gameState.awayScore && gameState.homeScore > 0;
 
   // --- Style Definitions ---
   const isLogoLeft = logoState.logoAlign === 'left';
@@ -64,13 +65,36 @@ export default function OverlayCompat() {
       position: 'relative',
       zIndex: 10,
     },
+    scrollingTextContainer: {
+      width: '360px',
+      backgroundColor: '#111827',
+      color: '#FBBF24',
+      fontFamily: 'var(--font-kanit), sans-serif',
+      fontSize: '18px',
+      fontWeight: '500',
+      overflow: 'hidden',
+      border: '2px solid #000000',
+      borderBottom: 'none',
+      borderRadius: '24px 24px 0 0',
+      position: 'relative',
+      whiteSpace: 'nowrap' as const,
+      boxShadow: '0 -4px 10px rgba(0,0,0,0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      
+      // Transitions
+      height: gameState.isScrollingTextVisible ? '36px' : '0px',
+      opacity: gameState.isScrollingTextVisible ? 1 : 0,
+      borderWidth: gameState.isScrollingTextVisible ? '2px 2px 0 2px' : '0px',
+      transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+    },
     mainTable: {
       borderCollapse: 'collapse',
       backgroundColor: '#111827',
       border: '2px solid #000000',
-      borderRadius: showSets ? '6px 6px 0 0' : '6px', // Rounded top corners or all corners
+      borderRadius: showSets ? '24px 24px 0 0' : '24px',
       boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-      overflow: 'hidden'
+      overflow: 'hidden',
     },
     teamCell: {
       padding: '4px 24px',
@@ -210,6 +234,13 @@ export default function OverlayCompat() {
         )}
 
         <div style={styles.scoreboardWrapper}>
+          {/* ======================= SCROLLING TEXT ======================= */}
+          <div style={styles.scrollingTextContainer}>
+             <div className="animate-marquee">
+               {gameState.scrollingText}
+             </div>
+          </div>
+
           <table style={styles.mainTable} className="animated-scoreboard">
             <tbody>
               <tr>
@@ -217,8 +248,8 @@ export default function OverlayCompat() {
                 <td style={{...styles.teamCell, ...styles.homeTeamCell}}>
                    <div style={styles.teamName}>{gameState.homeName}</div>
                 </td>
-                <td style={styles.scoreCell}>
-                  {gameState.homeScore}
+                <td style={styles.scoreCell} className={isTied ? "fire-cell" : ""}>
+                  <div className={isTied ? "fire-text" : ""}>{gameState.homeScore}</div>
                 </td>
 
                 {/* ======================= CENTER SECTION ======================= */}
@@ -242,8 +273,8 @@ export default function OverlayCompat() {
                 </td>
 
                 {/* ======================= AWAY TEAM ======================= */}
-                <td style={styles.scoreCell}>
-                   {gameState.awayScore}
+                <td style={styles.scoreCell} className={isTied ? "fire-cell" : ""}>
+                   <div className={isTied ? "fire-text" : ""}>{gameState.awayScore}</div>
                 </td>
                 <td style={{...styles.teamCell, ...styles.awayTeamCell}}>
                     <div style={styles.teamName}>{gameState.awayName}</div>

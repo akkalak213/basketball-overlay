@@ -12,6 +12,8 @@ export interface GameState {
   homeQuarterScores: number[];
   awayQuarterScores: number[];
   isOverlayVisible: boolean;
+  scrollingText: string;
+  isScrollingTextVisible: boolean;
 }
 
 export const initialState: GameState = {
@@ -28,6 +30,8 @@ export const initialState: GameState = {
   homeQuarterScores: [0, 0, 0, 0, 0],
   awayQuarterScores: [0, 0, 0, 0, 0],
   isOverlayVisible: true,
+  scrollingText: 'ยินดีต้อนรับเข้าสู่การแข่งขัน',
+  isScrollingTextVisible: false,
 };
 
 export interface LogoState {

@@ -23,6 +23,8 @@ export interface GameState {
   homeQuarterScores: number[];
   awayQuarterScores: number[];
   isOverlayVisible: boolean;
+  scrollingText: string;
+  isScrollingTextVisible: boolean;
 }
 
 export interface LogoState {
@@ -47,6 +49,8 @@ const initialState: GameState = {
   homeQuarterScores: [0, 0, 0, 0, 0],
   awayQuarterScores: [0, 0, 0, 0, 0],
   isOverlayVisible: true,
+  scrollingText: 'enter scrolling text here',
+  isScrollingTextVisible: false,
 };
 
 const initialLogoState: LogoState = {
@@ -65,14 +69,14 @@ export class ScoreGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-  private state: GameState = { 
+  private state: GameState = {
     ...initialState,
     homeQuarterScores: [...initialState.homeQuarterScores],
-    awayQuarterScores: [...initialState.awayQuarterScores]
+    awayQuarterScores: [...initialState.awayQuarterScores],
   };
   private logoState: LogoState = { ...initialLogoState };
 
-  afterInit(server: Server) {
+  afterInit() {
     console.log('WebSocket Initialized');
   }
 
@@ -81,7 +85,7 @@ export class ScoreGateway
     client.emit('syncLogo', this.logoState);
   }
 
-  handleDisconnect(client: Socket) {}
+  handleDisconnect() {}
 
   @SubscribeMessage('updateState')
   handleUpdateState(@MessageBody() updateData: Partial<GameState>): GameState {
@@ -99,10 +103,10 @@ export class ScoreGateway
 
   @SubscribeMessage('resetState')
   handleResetState(): GameState {
-    this.state = { 
-      ...initialState, 
-      homeQuarterScores: [...initialState.homeQuarterScores], 
-      awayQuarterScores: [...initialState.awayQuarterScores] 
+    this.state = {
+      ...initialState,
+      homeQuarterScores: [...initialState.homeQuarterScores],
+      awayQuarterScores: [...initialState.awayQuarterScores],
     };
     this.server.emit('syncState', this.state);
     return this.state;
