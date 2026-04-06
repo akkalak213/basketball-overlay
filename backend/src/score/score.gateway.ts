@@ -30,6 +30,7 @@ export interface LogoState {
   logoSize: number;
   logoOffset: number;
   logoOffsetX: number;
+  logoAlign: 'center' | 'left' | 'right';
 }
 
 const initialState: GameState = {
@@ -53,6 +54,7 @@ const initialLogoState: LogoState = {
   logoSize: 160,
   logoOffset: -30,
   logoOffsetX: 0,
+  logoAlign: 'center',
 };
 
 @WebSocketGateway({

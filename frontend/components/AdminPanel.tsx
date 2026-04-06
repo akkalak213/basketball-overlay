@@ -35,7 +35,6 @@ export default function AdminPanel() {
         else if (a > h) aw++;
       }
       if (hw !== gameState.homeSetsWon || aw !== gameState.awaySetsWon) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         updateState({ homeSetsWon: hw, awaySetsWon: aw });
       }
     }
@@ -132,6 +131,13 @@ export default function AdminPanel() {
                 {gameState.isOverlayVisible ? 'Hide Overlay' : 'Show Overlay'}
               </button>
               <button
+                onClick={() => updateState({ homeScore: 0, awayScore: 0 })}
+                className="flex items-center px-4 py-2 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 rounded-lg font-bold transition-colors border border-yellow-100"
+              >
+                <RotateCcw size={16} className="mr-2" />
+                Reset Score
+              </button>
+              <button
                 onClick={resetState}
                 className="flex items-center px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-bold transition-colors border border-red-100"
               >
@@ -180,7 +186,7 @@ export default function AdminPanel() {
                       </button>
                     </div>
                     
-                    <div className="w-full max-w-[250px] space-y-2">
+                    <div className="w-full max-w-62.5 space-y-2">
                       <div className="flex flex-col">
                         <label className="text-[10px] font-bold text-neutral-500 flex justify-between">
                           <span>Size (Height)</span>
@@ -217,10 +223,30 @@ export default function AdminPanel() {
                           className="w-full accent-blue-600 h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer"
                         />
                       </div>
+                      <div className="flex flex-col">
+                        <label className="text-[10px] font-bold text-neutral-500 flex justify-between mb-1">
+                          <span>Alignment</span>
+                        </label>
+                        <div className="flex gap-2">
+                          {['left', 'center', 'right'].map(align => (
+                            <button
+                              key={align}
+                              onClick={() => updateLogo({ logoAlign: align as 'left' | 'center' | 'right' })}
+                              className={`flex-1 py-1 text-xs font-bold rounded border ${
+                                (logoState.logoAlign || 'center') === align 
+                                  ? 'bg-blue-50 text-blue-600 border-blue-200' 
+                                  : 'bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50'
+                              }`}
+                            >
+                              {align.charAt(0).toUpperCase() + align.slice(1)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="h-20 flex items-center justify-center border-2 border-dashed border-neutral-300 rounded-lg w-full max-w-[200px] text-neutral-400 text-sm">
+                  <div className="h-20 flex items-center justify-center border-2 border-dashed border-neutral-300 rounded-lg w-full max-w-50 text-neutral-400 text-sm">
                     No Logo Selected
                   </div>
                 )}
@@ -229,7 +255,7 @@ export default function AdminPanel() {
                   accept="image/*" 
                   onChange={handleLogoUpload} 
                   ref={fileInputRef}
-                  className="block w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 max-w-[250px]"
+                  className="block w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 max-w-62.5"
                 />
              </div>
           </div>
@@ -262,7 +288,7 @@ export default function AdminPanel() {
                          type="color" 
                          value={gameState.homeColor || '#1D4ED8'} 
                          onChange={(e) => updateState({ homeColor: e.target.value })}
-                         className="absolute inset-[-10px] w-12 h-12 cursor-pointer opacity-0"
+                         className="absolute -inset-2.5 w-12 h-12 cursor-pointer opacity-0"
                        />
                        <div className="w-full h-full" style={{ backgroundColor: gameState.homeColor || '#1D4ED8' }}></div>
                      </label>
@@ -341,7 +367,7 @@ export default function AdminPanel() {
                          type="color" 
                          value={gameState.awayColor || '#BE123C'} 
                          onChange={(e) => updateState({ awayColor: e.target.value })}
-                         className="absolute inset-[-10px] w-12 h-12 cursor-pointer opacity-0"
+                         className="absolute -inset-2.5 w-12 h-12 cursor-pointer opacity-0"
                        />
                        <div className="w-full h-full" style={{ backgroundColor: gameState.awayColor || '#BE123C' }}></div>
                      </label>
