@@ -20,6 +20,10 @@ export default function OverlayCompat() {
   const showSets = gameState.sportType === 'volleyball' || gameState.sportType === 'takraw';
   const isTied = gameState.homeScore === gameState.awayScore && gameState.homeScore > 0;
 
+  // Calculate dynamic duration based on text length to maintain constant scrolling speed
+  const textLength = gameState.scrollingText ? gameState.scrollingText.length : 0;
+  const marqueeDuration = `${6 + (textLength * 0.2)}s`;
+
   // --- Style Definitions ---
   const isLogoLeft = logoState.logoAlign === 'left';
   const isLogoCenter = logoState.logoAlign === 'center' || !logoState.logoAlign;
@@ -336,7 +340,7 @@ export default function OverlayCompat() {
 
             {/* ======================= SCROLLING TEXT ======================= */}
             <div style={styles.scrollingTextContainer}>
-               <div className="animate-marquee">
+               <div className="animate-marquee" style={{ animationDuration: marqueeDuration }}>
                  {gameState.scrollingText}
                </div>
             </div>
