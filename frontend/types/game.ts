@@ -14,6 +14,8 @@ export interface GameState {
   isOverlayVisible: boolean;
   scrollingText: string;
   isScrollingTextVisible: boolean;
+  matchPoint: 'home' | 'away' | null;
+  winner: 'home' | 'away' | null;
 }
 
 export const initialState: GameState = {
@@ -32,6 +34,8 @@ export const initialState: GameState = {
   isOverlayVisible: true,
   scrollingText: 'ยินดีต้อนรับเข้าสู่การแข่งขัน',
   isScrollingTextVisible: false,
+  matchPoint: null,
+  winner: null,
 };
 
 export interface LogoState {

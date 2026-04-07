@@ -16,7 +16,7 @@ export default function OverlayCompat() {
   const awayColor = gameState.awayColor || '#BE123C';
 
   const isBasketball = gameState.sportType === 'basketball3x3';
-  const numSets = gameState.sportType === 'takraw' ? 3 : 5;
+  const numSets = 3;
   const showSets = gameState.sportType === 'volleyball' || gameState.sportType === 'takraw';
   const isTied = gameState.homeScore === gameState.awayScore && gameState.homeScore > 0;
 
@@ -205,6 +205,33 @@ export default function OverlayCompat() {
           50% { box-shadow: 0 10px 35px rgba(255,255,255,0.1); }
           100% { box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         }
+        @keyframes pulseGlowOuter {
+          0% { opacity: 0.8; box-shadow: 0 -4px 10px rgba(251, 191, 36, 0.4); }
+          50% { opacity: 1; box-shadow: 0 -4px 20px rgba(251, 191, 36, 0.8); }
+          100% { opacity: 0.8; box-shadow: 0 -4px 10px rgba(251, 191, 36, 0.4); }
+        }
+        @keyframes rotateLight {
+          0% { transform: translate(-50%, -50%) rotate(0deg); }
+          100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes winnerBgFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes winnerZoomIn {
+          0% { opacity: 0; transform: scale(0.5) translateY(100px); }
+          60% { opacity: 1; transform: scale(1.1) translateY(-20px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes winnerTrophyFloat {
+          0% { transform: translateY(0) rotate(0deg); filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+          50% { transform: translateY(-20px) rotate(5deg); filter: drop-shadow(0 0 60px rgba(255,215,0,0.9)); }
+          100% { transform: translateY(0) rotate(0deg); filter: drop-shadow(0 0 20px rgba(255,215,0,0.5)); }
+        }
+        @keyframes winnerShine {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
         .animated-logo-entrance {
           animation: slideUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           opacity: 0;
@@ -220,6 +247,55 @@ export default function OverlayCompat() {
           animation: slideUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
           opacity: 0;
         }
+        .scoreboard-glow-wrapper {
+          position: relative;
+          padding: 4px;
+          border-radius: ${showSets ? '28px 28px 0 0' : '28px'};
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Smoother shadow */
+          display: flex;
+          flex-direction: column;
+        }
+        .scoreboard-glow-wrapper::before {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 4000px;
+          height: 4000px;
+          background: conic-gradient(
+            from 0deg,
+            rgba(255, 0, 60, 1) 0%,
+            transparent 15%,
+            transparent 35%,
+            rgba(0, 240, 255, 1) 50%,
+            transparent 65%,
+            transparent 85%,
+            rgba(255, 0, 60, 1) 100%
+          );
+          animation: rotateLight 5s linear infinite;
+          transform-origin: center;
+          z-index: -1;
+          filter: blur(8px);
+        }
+        .scoreboard-glow-inner {
+          background-color: transparent;
+          border-radius: ${showSets ? '24px 24px 0 0' : '24px'};
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          z-index: 1;
+          overflow: hidden;
+        }
+        @keyframes rotateLight {
+          0% { transform: translate(-50%, -50%) rotate(0deg); }
+          100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes pulseGlowOuter {
+          0% { opacity: 0.8; box-shadow: 0 -4px 10px rgba(251, 191, 36, 0.4); }
+          50% { opacity: 1; box-shadow: 0 -4px 20px rgba(251, 191, 36, 0.8); }
+          100% { opacity: 0.8; box-shadow: 0 -4px 10px rgba(251, 191, 36, 0.4); }
+        }
       `}</style>
 
       <div style={styles.wrapper}>
@@ -234,15 +310,42 @@ export default function OverlayCompat() {
         )}
 
         <div style={styles.scoreboardWrapper}>
-          {/* ======================= SCROLLING TEXT ======================= */}
-          <div style={styles.scrollingTextContainer}>
-             <div className="animate-marquee">
-               {gameState.scrollingText}
-             </div>
+          
+          <div style={{ width: '100%', position: 'relative', display: 'flex', justifyContent: 'center', zIndex: 11 }}>
+            {/* ======================= MATCH POINT BADGES ======================= */}
+            {(gameState.matchPoint === 'home' || gameState.matchPoint === 'away') && (
+              <div style={{
+                position: 'absolute',
+                bottom: '-4px', // Connects directly to the scoreboard
+                [gameState.matchPoint === 'home' ? 'left' : 'right']: '40px',
+                backgroundColor: '#FBBF24',
+                color: '#000',
+                fontSize: '12px',
+                fontWeight: '900',
+                padding: '4px 16px',
+                borderRadius: '8px 8px 0 0',
+                letterSpacing: '0.1em',
+                boxShadow: '0 -4px 10px rgba(251, 191, 36, 0.4)',
+                border: '2px solid #000',
+                borderBottom: 'none',
+                animation: 'pulseGlowOuter 1.5s infinite',
+              }}>
+                MATCH POINT
+              </div>
+            )}
+
+            {/* ======================= SCROLLING TEXT ======================= */}
+            <div style={styles.scrollingTextContainer}>
+               <div className="animate-marquee">
+                 {gameState.scrollingText}
+               </div>
+            </div>
           </div>
 
-          <table style={styles.mainTable} className="animated-scoreboard">
-            <tbody>
+          {/* ======================= GLOW WRAPPER ======================= */}
+          <div className="scoreboard-glow-wrapper animated-scoreboard">
+            <table style={styles.mainTable}>
+              <tbody>
               <tr>
                 {/* ======================= HOME TEAM ======================= */}
                 <td style={{...styles.teamCell, ...styles.homeTeamCell}}>
@@ -277,11 +380,12 @@ export default function OverlayCompat() {
                    <div className={isTied ? "fire-text" : ""}>{gameState.awayScore}</div>
                 </td>
                 <td style={{...styles.teamCell, ...styles.awayTeamCell}}>
-                    <div style={styles.teamName}>{gameState.awayName}</div>
+                   <div style={styles.teamName}>{gameState.awayName}</div>
                 </td>
               </tr>
             </tbody>
           </table>
+          </div>
           
           {/* ======================= SET SCORES ======================= */}
           {showSets && (

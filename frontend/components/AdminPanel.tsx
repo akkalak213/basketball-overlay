@@ -30,7 +30,7 @@ export default function AdminPanel() {
   // Auto-calculate sets won
   useEffect(() => {
     if (gameState.sportType === 'volleyball' || gameState.sportType === 'takraw') {
-      const numSets = gameState.sportType === 'takraw' ? 3 : 5;
+      const numSets = 3;
       let hw = 0;
       let aw = 0;
       for (let i = 0; i < numSets; i++) {
@@ -121,7 +121,7 @@ export default function AdminPanel() {
     });
   };
 
-  const numSets = gameState.sportType === 'takraw' ? 3 : 5;
+  const numSets = 3;
   const showSets = gameState.sportType === 'volleyball' || gameState.sportType === 'takraw';
 
   return (
@@ -186,7 +186,7 @@ export default function AdminPanel() {
                 onClick={() => updateState({ sportType: 'volleyball' })}
                 className={`px-6 py-3 rounded-xl font-bold transition-all ${gameState.sportType === 'volleyball' ? 'bg-blue-600 text-white shadow-md' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
              >
-                🏐 Volleyball (5 Sets)
+                🏐 Volleyball (3 Sets)
              </button>
              <button 
                 onClick={() => updateState({ sportType: 'takraw' })}
@@ -375,6 +375,18 @@ export default function AdminPanel() {
                       <button onClick={() => handleScoreChange('home', 2)} className="py-4 px-6 bg-neutral-800 text-white hover:bg-black rounded-xl font-black text-2xl shadow-sm transition-colors">+2</button>
                       <button onClick={() => handleScoreChange('home', 3)} className="py-4 px-6 bg-neutral-800 text-white hover:bg-black rounded-xl font-black text-2xl shadow-sm transition-colors">+3</button>
                       <button onClick={() => handleScoreChange('home', -1)} className="col-span-2 py-2 bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 rounded-xl font-bold text-sm transition-colors">-1 (Undo)</button>
+                      <button 
+                        onClick={() => updateState({ matchPoint: gameState.matchPoint === 'home' ? null : 'home' })} 
+                        className={`col-span-2 py-3 rounded-xl font-bold text-sm border transition-colors ${gameState.matchPoint === 'home' ? 'bg-yellow-400 text-yellow-900 border-yellow-500 shadow-md' : 'bg-neutral-50 text-neutral-500 border-neutral-200 hover:bg-neutral-100'}`}
+                      >
+                        {gameState.matchPoint === 'home' ? '⭐ Match Point (Active)' : 'Set Match Point'}
+                      </button>
+                      <button 
+                        onClick={() => updateState({ winner: gameState.winner === 'home' ? null : 'home', matchPoint: null })} 
+                        className={`col-span-2 py-3 rounded-xl font-black text-sm border transition-colors ${gameState.winner === 'home' ? 'bg-green-500 text-white border-green-600 shadow-lg' : 'bg-neutral-800 text-white border-neutral-900 hover:bg-black'}`}
+                      >
+                        {gameState.winner === 'home' ? '🏆 Winner (Active)' : 'Set Winner'}
+                      </button>
                    </div>
                 </div>
 
@@ -455,6 +467,18 @@ export default function AdminPanel() {
                       <button onClick={() => handleScoreChange('away', 2)} className="py-4 px-6 bg-neutral-800 text-white hover:bg-black rounded-xl font-black text-2xl shadow-sm transition-colors">+2</button>
                       <button onClick={() => handleScoreChange('away', 3)} className="py-4 px-6 bg-neutral-800 text-white hover:bg-black rounded-xl font-black text-2xl shadow-sm transition-colors">+3</button>
                       <button onClick={() => handleScoreChange('away', -1)} className="col-span-2 py-2 bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 rounded-xl font-bold text-sm transition-colors">-1 (Undo)</button>
+                      <button 
+                        onClick={() => updateState({ matchPoint: gameState.matchPoint === 'away' ? null : 'away' })} 
+                        className={`col-span-2 py-3 rounded-xl font-bold text-sm border transition-colors ${gameState.matchPoint === 'away' ? 'bg-yellow-400 text-yellow-900 border-yellow-500 shadow-md' : 'bg-neutral-50 text-neutral-500 border-neutral-200 hover:bg-neutral-100'}`}
+                      >
+                        {gameState.matchPoint === 'away' ? '⭐ Match Point (Active)' : 'Set Match Point'}
+                      </button>
+                      <button 
+                        onClick={() => updateState({ winner: gameState.winner === 'away' ? null : 'away', matchPoint: null })} 
+                        className={`col-span-2 py-3 rounded-xl font-black text-sm border transition-colors ${gameState.winner === 'away' ? 'bg-green-500 text-white border-green-600 shadow-lg' : 'bg-neutral-800 text-white border-neutral-900 hover:bg-black'}`}
+                      >
+                        {gameState.winner === 'away' ? '🏆 Winner (Active)' : 'Set Winner'}
+                      </button>
                    </div>
                 </div>
 

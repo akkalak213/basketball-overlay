@@ -25,6 +25,8 @@ export interface GameState {
   isOverlayVisible: boolean;
   scrollingText: string;
   isScrollingTextVisible: boolean;
+  matchPoint: 'home' | 'away' | null;
+  winner: 'home' | 'away' | null;
 }
 
 export interface LogoState {
@@ -51,6 +53,8 @@ const initialState: GameState = {
   isOverlayVisible: true,
   scrollingText: 'enter scrolling text here',
   isScrollingTextVisible: false,
+  matchPoint: null,
+  winner: null,
 };
 
 const initialLogoState: LogoState = {
@@ -68,7 +72,7 @@ const initialLogoState: LogoState = {
 export class ScoreGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  @WebSocketServer() server: Server;
+  @WebSocketServer() server!: Server;
   private state: GameState = {
     ...initialState,
     homeQuarterScores: [...initialState.homeQuarterScores],
