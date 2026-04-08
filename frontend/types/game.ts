@@ -31,7 +31,7 @@ export const initialState: GameState = {
   period: 1,
   homeQuarterScores: [0, 0, 0, 0, 0],
   awayQuarterScores: [0, 0, 0, 0, 0],
-  isOverlayVisible: true,
+  isOverlayVisible: false,
   scrollingText: 'ยินดีต้อนรับเข้าสู่การแข่งขัน',
   isScrollingTextVisible: false,
   matchPoint: null,
